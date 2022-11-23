@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: API Аутентификации
+  version: v1.1.1
+servers:
+- url: https://api.beget.com
+security:
+- bearerAuth: []
+tags:
+- name: AuthService
+- name: KeyService
+paths:
+  /v1/auth:
+    post:
+      operationId: AuthService_Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth_AuthRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_AuthResponse'
+          description: OK
+      tags:
+      - AuthService
+  /v1/auth/key:
+    get:
+      operationId: KeyService_GetKey
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Key_GetKeyResponse'
+          description: OK
+      tags:
+      - KeyService
+  /v1/auth/logout:
+    post:
+      operationId: AuthService_Logout
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_LogoutResponse'
+          description: OK
+      tags:
+      - AuthService
+  /v1/auth/refresh:
+    post:
+      operationId: AuthService_RefreshToken
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_RefreshTokenResponse'
+          description: OK
+      tags:
+      - AuthService
+  /v1/auth/switch:
+    post:
+      operationId: AuthService_SwitchUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth_SwitchUserRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_SwitchUserResponse'
+          description: OK
+      tags:
+      - AuthService
+components:
+  schemas:
+    Auth_AuthRequest:
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        code:
+          type: string
+        saveMe:
+          type: boolean
+      type: object
+    Auth_AuthResponse:
+      example:
+        error: INTERNAL_ERROR
+        token: token
+      properties:
+        token:
+          type: string
+        error:
+          enum:
+          - INTERNAL_ERROR
+          - EMPTY_LOGIN
+          - EMPTY_PASSWORD
+          - INCORRECT_CREDENTIALS
+          - IP_BLOCKED
+          - CODE_REQUIRED
+          - INCORRECT_CODE
+          - CODE_SENT_LIMIT
+          - CODE_INPUT_LIMIT
+          - ACCOUNT_ON_MAINTANCE
+          - ACCOUNT_DELETED
+          - CODE_REQUIRED_EMAIL
+          - CODE_REQUIRED_SMS
+          format: enum
+          type: string
+      type: object
+    Auth_LogoutResponse:
+      properties: {}
+      type: object
+    Auth_RefreshTokenResponse:
+      example:
+        error: INTERNAL_ERROR
+        token: token
+      properties:
+        token:
+          type: string
+        error:
+          enum:
+          - INTERNAL_ERROR
+          - PAYLOAD_CHANGED
+          - IP_BLOCKED
+          - ACCOUNT_ON_MAINTANCE
+          - ACCOUNT_DELETED
+          - TOKEN_REVOKED
+          format: enum
+          type: string
+      type: object
+    Auth_SwitchUserRequest:
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        code:
+          type: string
+      type: object
+    Auth_SwitchUserResponse:
+      example:
+        error: INTERNAL_ERROR
+        token: token
+      properties:
+        token:
+          type: string
+        error:
+          enum:
+          - INTERNAL_ERROR
+          - EMPTY_TARGET_LOGIN
+          - TARGET_FORBIDDEN
+          - TARGET_NOT_FOUND
+          - TARGET_PASSWORD_REQUIRED
+          - TARGET_CODE_REQUIRED
+          - TARGET_INCORRECT_CODE
+          - SENT_LIMIT_REACHED
+          - INPUT_LIMIT_REACHED
+          - TARGET_ON_MAINTENANCE
+          - TARGET_DELETED
+          - TOKEN_REVOKED
+          - CODE_REQUIRED_EMAIL
+          - CODE_REQUIRED_SMS
+          - IP_BLOCKED
+          format: enum
+          type: string
+      type: object
+    Key_GetKeyResponse:
+      example:
+        key: key
+      properties:
+        key:
+          type: string
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
